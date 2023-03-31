@@ -1,3 +1,4 @@
+from test import app
 from fastapi import FastAPI, HTTPException
 from fastapi.exception_handlers import (
     http_exception_handler,
@@ -6,7 +7,6 @@ from fastapi.exception_handlers import (
 from fastapi.exceptions import RequestValidationError
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
-from test import app
 
 @app.exception_handler(HTTPException)
 async def custom_http_exception_handler(request, exc):
