@@ -21,7 +21,7 @@ const InputItem = ({ type = "text", label, value, onChange }: IProps) => {
 const StyledWrapper = styled.div`
   position: relative;
   width: 310px;
-  margin: 50px 30px;
+  margin: 50px 10px;
 
   input {
     font-size: 15px;
