@@ -9,6 +9,7 @@ import (
 
 	"github.com/go-ldap/ldap/v3"
 	"github.com/gorilla/mux"
+	"github.com/rs/cors"
 )
 
 type Configuration struct {
@@ -21,16 +22,15 @@ type Configuration struct {
 	TestPass     string `json:"pass"`
 }
 
-// var users = map[string]*User{}
-
-// type User struct {
-// 	Nickname string `json:"nickname"`
-// 	Email    string `json:"email"`
-// }
-
 type LDAPUser struct {
 	Id         string `json:"id"`
 	Password   string `json:"pass"`
+}
+
+type LDAPInfo struct {
+	IsSuccess     bool    `json:"isSuccess"`
+	UserName      string  `json:"userName"`
+	UserFirstName string  `json:"userFirstName"`
 }
 
 func main() {
@@ -55,15 +55,25 @@ func main() {
 				if err != nil {
 					log.Fatal(err)
 				}
-				json.NewEncoder(wr).Encode(result.Entries[0])
+
+				res := LDAPInfo{
+					IsSuccess:     true,
+					UserName:      result.Entries[0].Attributes[0].Values[0],
+					UserFirstName: result.Entries[0].Attributes[1].Values[0],
+				}
+
+				sndData, _ := json.Marshal(res)
+				json.NewEncoder(wr).Encode(string(sndData))
 		}
 	})
 
 	// 9000 포트에 서버 띄우기.
-    http.ListenAndServe(":9000", jsonMiddleware(router))
+	handler := cors.Default().Handler(router)
+    http.ListenAndServe(":9000", jsonMiddleware(handler))
 }
 
 func LoadConfigration() Configuration {
+	
     var config Configuration
     file, err := os.Open("config.json")
     defer file.Close()
